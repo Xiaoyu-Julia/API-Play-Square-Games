@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Test-API-Play-Square-Games",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
