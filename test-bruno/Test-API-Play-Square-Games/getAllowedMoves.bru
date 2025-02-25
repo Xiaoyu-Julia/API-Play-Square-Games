@@ -1,11 +1,11 @@
 meta {
-  name: getGameById
+  name: getAllowedMoves
   type: http
-  seq: 5
+  seq: 6
 }
 
 get {
-  url: http://localhost:8080/games/:gameId
+  url: http://localhost:8080/games/:gameId/moves
   body: none
   auth: none
 }

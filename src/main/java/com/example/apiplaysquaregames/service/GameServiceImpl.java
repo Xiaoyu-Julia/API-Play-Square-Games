@@ -2,12 +2,10 @@ package com.example.apiplaysquaregames.service;
 
 import com.example.apiplaysquaregames.controller.GameCreationParams;
 import com.example.apiplaysquaregames.controller.GameDto;
-import fr.le_campus_numerique.square_games.engine.CellPosition;
-import fr.le_campus_numerique.square_games.engine.Game;
-import fr.le_campus_numerique.square_games.engine.GameFactory;
-import fr.le_campus_numerique.square_games.engine.GameStatus;
+import fr.le_campus_numerique.square_games.engine.*;
 import fr.le_campus_numerique.square_games.engine.connectfour.ConnectFourGameFactory;
 import fr.le_campus_numerique.square_games.engine.taquin.TaquinGameFactory;
+import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGame;
 import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGameFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,8 +78,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Set<CellPosition> getAllowedMoves(UUID id) {
-
-        return Set.of();
+        Collection<Token> remainingTokens = games.get(id).getRemainingTokens();
+        return Set.of(remainingTokens.stream().map(Token::getAllowedMoves).flatMap(Collection::stream).toArray(CellPosition[]::new));
     }
 
     @Override
