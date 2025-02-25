@@ -6,6 +6,14 @@ meta {
 
 post {
   url: http://localhost:8080/games
-  body: none
+  body: json
   auth: none
+}
+
+body:json {
+  {
+     "gameType" : "tictactoe",
+     "boardSize" : 3,
+     "playerCount" : 2 
+  }
 }

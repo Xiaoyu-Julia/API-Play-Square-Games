@@ -3,11 +3,14 @@ package com.example.apiplaysquaregames.controller;
 import com.example.apiplaysquaregames.service.GameService;
 import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.Game;
-import fr.le_campus_numerique.square_games.engine.taquin.TaquinGame;
+import fr.le_campus_numerique.square_games.engine.GameStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @RestController
 public class GameController {
@@ -18,27 +21,34 @@ public class GameController {
     @PostMapping("/games")
     public GameDto addGame(@RequestBody GameCreationParams gameCreationParams) {
         Game game =  gameService.createGame(gameCreationParams);
-        return new GameDto(game.getId() ,game.getFactoryId()) ;
+        return new GameDto(game.getId().toString(),game.getFactoryId()) ;
     }
 
-    @GetMapping("/games?ended=status")
-    public List<GameDto> getAllGames(String status) {
-        return null;
+    @GetMapping("/games/by-status/{status}")
+    public List<GameDto> getAllGamesByStatus(@PathVariable GameStatus status) {
+        List<Game> games = gameService.getAllGamesByStatus(status);
+        List<GameDto> gameDtos = new ArrayList<>();
+        games.forEach(game->{
+            gameDtos.add(new GameDto(game.getId().toString(),game.getFactoryId()));
+        });
+        return gameDtos;
     }
 
     @GetMapping("/games/{gameId}")
     public GameDto getGame(@PathVariable String gameId) {
-        return null;
+        Game game = gameService.getGameById(UUID.fromString(gameId));
+        return new GameDto(game.getId().toString(),game.getFactoryId()) ;
     }
 
     @GetMapping("/games/{gameId}/moves")
-    public List<CellPosition> getAllowedMoves(@PathVariable String gameId) {
-        return null;
+    public Set<CellPosition> getAllowedMoves(@PathVariable String gameId) {
+        return gameService.getAllowedMoves(UUID.fromString(gameId));
     }
 
     @PutMapping("/games/{gameId}/moves")
-    public String moveTo(@PathVariable String gameId, @RequestBody CellPosition position) {
-        return null;
+    public void moveTo(@PathVariable String gameId, @RequestBody CellPosition position) {
+        gameService.moveTo(UUID.fromString(gameId), position);
+
     }
 
 }

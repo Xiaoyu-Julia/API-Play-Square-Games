@@ -16,39 +16,82 @@ import java.util.*;
 
 @Service
 public class GameServiceImpl implements GameService {
+    private final Map<UUID, Game> games = new HashMap<>();
+    public GameServiceImpl() {}
 
-    List<Game> games = new ArrayList<Game>();
+   // List<Game> games = new ArrayList<Game>();
+
+//    @Override
+//    public Game createGame(GameCreationParams gameCreationParams) {
+//        if(gameCreationParams.getGameType().equals("tictactoe")){
+//            Game newGame =  new TicTacToeGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
+//            return games.put(newGame.getId(), newGame);
+//        } else if (gameCreationParams.getGameType().equals("15 puzzle")) {
+//            Game newGame =  new TaquinGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
+//            return games.put(newGame.getId(), newGame);
+//        } else if (gameCreationParams.getGameType().equals("connect4")) {
+//            Game newGame = new ConnectFourGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
+//            return games.put(newGame.getId(), newGame);
+//        } else {
+//            throw new IllegalArgumentException("game type can not be found");
+//        }
+//
+//    }
 
     @Override
     public Game createGame(GameCreationParams gameCreationParams) {
-        if(gameCreationParams.getGameType().equals("tictactoe")){
-            return new TicTacToeGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
-        } else if (gameCreationParams.getGameType().equals("15 puzzle")) {
-            return new TaquinGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
-        } else if (gameCreationParams.getGameType().equals("connect4")) {
-            return new ConnectFourGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
-        } else {
-            throw new IllegalArgumentException("game type can not be found");
+        Game newGame;
+        switch (gameCreationParams.getGameType()) {
+            case "tictactoe" -> {
+                newGame = new TicTacToeGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
+            }
+            case "15 puzzle" -> {
+                newGame = new TaquinGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
+            }
+            case "connect4" -> {
+                newGame = new ConnectFourGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
+            }
+            default -> throw new IllegalArgumentException("game type can not be found");
         }
+        games.put(newGame.getId(), newGame);
+        return newGame;
     }
 
     @Override
     public List<Game> getAllGamesByStatus(GameStatus status){
-        return games.stream().toList();
+
+        List<Game> filteredGames = new ArrayList<>();
+        for (Game game : games.values()) {
+            if (game.getStatus() == status) {
+                switch (status) {
+                    case SETUP, TERMINATED, ONGOING -> {
+                        filteredGames.add(game);
+                    }
+                }
+            }
+        }
+        return filteredGames;
     }
 
     @Override
     public  Game getGameById(UUID id) {
-        return games.stream().filter(g -> g.getId().equals(id)).findFirst().orElse(null);
+        return games.get(id);
     }
 
     @Override
     public Set<CellPosition> getAllowedMoves(UUID id) {
+
         return Set.of();
     }
 
     @Override
     public void moveTo(UUID id, CellPosition position) {
+        if (!games.containsKey(id)) {
+            throw new IllegalArgumentException("Game does not exist");
+        }
+        Game game = games.get(id);
+
+
 
     }
 }

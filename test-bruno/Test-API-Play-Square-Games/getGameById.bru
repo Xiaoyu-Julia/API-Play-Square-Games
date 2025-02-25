@@ -1,0 +1,15 @@
+meta {
+  name: getGameById
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:8080/games/:gameId
+  body: none
+  auth: none
+}
+
+params:path {
+  gameId: 8f000afb-f262-4a04-8e03-b2c67df7fc41
+}

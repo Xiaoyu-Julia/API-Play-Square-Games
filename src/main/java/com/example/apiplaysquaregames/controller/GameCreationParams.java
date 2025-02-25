@@ -1,12 +1,14 @@
 package com.example.apiplaysquaregames.controller;
 
 
+import jakarta.validation.constraints.NotNull;
+
 public class GameCreationParams {
     private String gameType;
     private int boardSize;
     private int playerCount;
 
-    public GameCreationParams(String gameType, int boardSize, int playerCount) {
+    public GameCreationParams(@NotNull String gameType, @NotNull int boardSize, @NotNull int playerCount) {
         this.gameType = gameType;
         this.boardSize = boardSize;
         this.playerCount = playerCount;
