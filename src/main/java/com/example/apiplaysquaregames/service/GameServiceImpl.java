@@ -1,23 +1,24 @@
 package com.example.apiplaysquaregames.service;
 
 import com.example.apiplaysquaregames.controller.GameCreationParams;
-import com.example.apiplaysquaregames.controller.GameDto;
 import fr.le_campus_numerique.square_games.engine.*;
 import fr.le_campus_numerique.square_games.engine.connectfour.ConnectFourGameFactory;
 import fr.le_campus_numerique.square_games.engine.taquin.TaquinGameFactory;
-import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGame;
 import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGameFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
 @Service
 public class GameServiceImpl implements GameService {
     private final Map<UUID, Game> games = new HashMap<>();
-    public GameServiceImpl() {}
 
-   // List<Game> games = new ArrayList<Game>();
+    public GameServiceImpl() {
+    }
+
+    // List<Game> games = new ArrayList<Game>();
 
 //    @Override
 //    public Game createGame(GameCreationParams gameCreationParams) {
@@ -56,7 +57,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> getAllGamesByStatus(GameStatus status){
+    public List<Game> getAllGamesByStatus(GameStatus status) {
 
         List<Game> filteredGames = new ArrayList<>();
         for (Game game : games.values()) {
@@ -72,7 +73,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public  Game getGameById(UUID id) {
+    public Game getGameById(UUID id) {
         return games.get(id);
     }
 
@@ -83,13 +84,32 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void moveTo(UUID id, CellPosition position) {
-        if (!games.containsKey(id)) {
+    public void moveTo(UUID id, CellPosition position) throws InvalidPositionException {
+
+        if (games.containsKey(id) && games.get(id).getStatus() == GameStatus.ONGOING) {
+
+            Game game = games.get(id);
+
+            //if (playerId.equals(game.getCurrentPlayerId())) {
+
+                Optional<Token> tokenToMove = games.get(id).getRemainingTokens().stream()
+                        .filter(token -> token.getAllowedMoves().contains(position)
+                                && token.getOwnerId().isPresent() /*&& token.getOwnerId().equals(playerId)*/)
+                        .findFirst();
+
+                if (tokenToMove.isEmpty())
+                    throw new InvalidPositionException(/*playerId + " has no moves"*/position + " is not a valid move");
+
+                tokenToMove.get().moveTo(position);
+
+//            } else {
+//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wait for your turn");
+//            }
+
+        } else {
             throw new IllegalArgumentException("Game does not exist");
         }
-        Game game = games.get(id);
-
-
 
     }
+
 }

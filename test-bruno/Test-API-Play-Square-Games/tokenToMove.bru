@@ -1,15 +1,15 @@
 meta {
-  name: getAllowedMoves
+  name: tokenToMove
   type: http
-  seq: 6
+  seq: 7
 }
 
-get {
+put {
   url: http://localhost:8080/games/:gameId/moves
   body: none
   auth: none
 }
 
 params:path {
-  gameId: 350ff74f-439b-4ce8-82bb-6fa6c452b15e
+  gameId: 
 }

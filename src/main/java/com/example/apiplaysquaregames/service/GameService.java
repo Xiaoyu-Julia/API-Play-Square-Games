@@ -4,6 +4,7 @@ import com.example.apiplaysquaregames.controller.GameCreationParams;
 import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.Game;
 import fr.le_campus_numerique.square_games.engine.GameStatus;
+import fr.le_campus_numerique.square_games.engine.InvalidPositionException;
 
 import java.util.List;
 import java.util.Set;
@@ -19,7 +20,7 @@ public interface GameService {
 
     Set<CellPosition> getAllowedMoves(UUID id);
 
-    void moveTo(UUID id, CellPosition position);
+    void moveTo(UUID id, CellPosition position) throws InvalidPositionException;
 
 
 
