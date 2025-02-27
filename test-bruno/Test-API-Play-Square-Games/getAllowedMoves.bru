@@ -5,11 +5,15 @@ meta {
 }
 
 get {
-  url: http://localhost:8080/games/:gameId/moves
+  url: http://localhost:8081/games/:gameId/moves
   body: none
   auth: none
 }
 
 params:path {
-  gameId: 350ff74f-439b-4ce8-82bb-6fa6c452b15e
+  gameId: 268e5298-940e-4bb1-af4b-c309ff8a268d
+}
+
+headers {
+  X-UserId: a60a15ef-8ad9-4af5-a882-09e3462a20a7
 }

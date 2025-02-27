@@ -7,6 +7,7 @@ import fr.le_campus_numerique.square_games.engine.GameStatus;
 import fr.le_campus_numerique.square_games.engine.InvalidPositionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,9 @@ public class GameController {
     private GameService gameService;
 
     @PostMapping("/games")
-    public GameDto addGame(@RequestBody GameCreationParams gameCreationParams, @RequestHeader("X-UserId") UUID playerId) {
-        Game game =  gameService.createGame(gameCreationParams, playerId);
+    public GameDto addGame(@RequestBody GameCreationParams gameCreationParams,
+                           @RequestHeader("X-UserId") UUID playerId) {
+        Game game = gameService.createGame(gameCreationParams, playerId);
         return new GameDto(game.getId().toString(), game.getFactoryId(), game.getPlayerIds());
     }
 
@@ -37,7 +39,6 @@ public class GameController {
 
     @GetMapping("/games/{gameId}")
     public GameDto getGame(@PathVariable String gameId) {
-
         Game game = gameService.getGameById(UUID.fromString(gameId));
         return new GameDto(game.getId().toString(),game.getFactoryId(), game.getPlayerIds());
     }
@@ -49,6 +50,16 @@ public class GameController {
         return gameService.getAllowedMoves(gameId, playerId);
     }
 
+     private RestClient restClient = RestClient.create();
+
+    @GetMapping("/users/{userId}")
+    public UserDto getUser(@RequestHeader("X-Userid") UUID userId) {
+        return restClient.get()
+            .uri("http://localhost:8082/users/{userId}", userId)
+            .retrieve()
+            .body(UserDto.class);
+    }
+
     @PutMapping("/games/{gameId}/moves")
     public void moveTo(@PathVariable String gameId, @RequestHeader("X-UserId") UUID playerId, @RequestBody CellPosition position) throws InvalidPositionException {
         if( !gameService.getGameById(UUID.fromString(gameId)).getPlayerIds().contains(playerId))
@@ -56,5 +67,8 @@ public class GameController {
         gameService.moveTo(UUID.fromString(gameId), playerId, position);
 
     }
+
+
+
 
 }

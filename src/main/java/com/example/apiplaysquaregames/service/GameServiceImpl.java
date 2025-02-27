@@ -22,23 +22,27 @@ public class GameServiceImpl implements GameService {
     @Override
     public Game createGame(GameCreationParams gameCreationParams, UUID playerId) {
         Set<UUID> playerIds = new HashSet<>();
-        playerIds.add(UUID.randomUUID());
+        playerIds.add(playerId);
         Game newGame;
         switch (gameCreationParams.getGameType()) {
             case "tictactoe" -> {
-                newGame = new TicTacToeGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
-               // newGame = new TicTacToeGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(UUID.randomUUID()));
+                //newGame = new TicTacToeGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
+                newGame = new TicTacToeGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(playerId, UUID.randomUUID()));
             }
+
             case "15 puzzle" -> {
-               // newGame = new TaquinGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
-                newGame = new TaquinGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(UUID.randomUUID()));
+                //newGame = new TaquinGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
+                newGame = new TaquinGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(playerId, UUID.randomUUID()));
             }
+
             case "connect4" -> {
                // newGame = new ConnectFourGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
-                newGame = new ConnectFourGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(UUID.randomUUID()));
+                newGame = new ConnectFourGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(playerId, UUID.randomUUID()));
             }
+
             default -> throw new IllegalArgumentException("game type can not be found");
         }
+
         games.put(newGame.getId(), newGame);
         return newGame;
     }
