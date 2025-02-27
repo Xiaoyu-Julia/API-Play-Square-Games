@@ -20,9 +20,9 @@ public class GameController {
     private GameService gameService;
 
     @PostMapping("/games")
-    public GameDto addGame(@RequestBody GameCreationParams gameCreationParams ) {
-        Game game =  gameService.createGame(gameCreationParams);
-        return new GameDto(game.getId().toString(),game.getFactoryId()) ;
+    public GameDto addGame(@RequestBody GameCreationParams gameCreationParams, @RequestHeader("X-UserId") UUID playerId) {
+        Game game =  gameService.createGame(gameCreationParams, playerId);
+        return new GameDto(game.getId().toString(), game.getFactoryId(), game.getPlayerIds());
     }
 
     @GetMapping("/games/by-status/{status}")
@@ -30,25 +30,30 @@ public class GameController {
         List<Game> games = gameService.getAllGamesByStatus(status);
         List<GameDto> gameDtos = new ArrayList<>();
         games.forEach(game->{
-            gameDtos.add(new GameDto(game.getId().toString(),game.getFactoryId()));
+            gameDtos.add(new GameDto(game.getId().toString(),game.getFactoryId(), game.getPlayerIds()));
         });
         return gameDtos;
     }
 
     @GetMapping("/games/{gameId}")
     public GameDto getGame(@PathVariable String gameId) {
+
         Game game = gameService.getGameById(UUID.fromString(gameId));
-        return new GameDto(game.getId().toString(),game.getFactoryId()) ;
+        return new GameDto(game.getId().toString(),game.getFactoryId(), game.getPlayerIds());
     }
 
     @GetMapping("/games/{gameId}/moves")
-    public Set<CellPosition> getAllowedMoves(@PathVariable String gameId) {
-        return gameService.getAllowedMoves(UUID.fromString(gameId));
+    public Set<CellPosition> getAllowedMoves(@PathVariable UUID gameId) {
+        //return gameService.getAllowedMoves(gameId);
+        UUID playerId = gameService.getGameById(gameId).getCurrentPlayerId();
+        return gameService.getAllowedMoves(gameId, playerId);
     }
 
     @PutMapping("/games/{gameId}/moves")
-    public void moveTo(@PathVariable String gameId, @RequestBody CellPosition position) throws InvalidPositionException {
-        gameService.moveTo(UUID.fromString(gameId), position);
+    public void moveTo(@PathVariable String gameId, @RequestHeader("X-UserId") UUID playerId, @RequestBody CellPosition position) throws InvalidPositionException {
+        if( !gameService.getGameById(UUID.fromString(gameId)).getPlayerIds().contains(playerId))
+           throw new IllegalArgumentException("player id invalid");
+        gameService.moveTo(UUID.fromString(gameId), playerId, position);
 
     }
 

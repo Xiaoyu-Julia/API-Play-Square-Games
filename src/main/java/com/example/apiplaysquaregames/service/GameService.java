@@ -12,15 +12,15 @@ import java.util.UUID;
 
 public interface GameService {
 
-    Game createGame(GameCreationParams gameCreationParams);
+    Game createGame(GameCreationParams gameCreationParams, UUID playerId);
 
     List<Game> getAllGamesByStatus(GameStatus status);
 
     Game getGameById(UUID id);
 
-    Set<CellPosition> getAllowedMoves(UUID id);
+    Set<CellPosition> getAllowedMoves(UUID id, UUID playerId);
 
-    void moveTo(UUID id, CellPosition position) throws InvalidPositionException;
+    void moveTo(UUID id, UUID playerId, CellPosition position) throws InvalidPositionException;
 
 
 
