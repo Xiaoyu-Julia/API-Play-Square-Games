@@ -5,6 +5,8 @@ import fr.le_campus_numerique.square_games.engine.*;
 import fr.le_campus_numerique.square_games.engine.connectfour.ConnectFourGameFactory;
 import fr.le_campus_numerique.square_games.engine.taquin.TaquinGameFactory;
 import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGameFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,43 +15,55 @@ import java.util.*;
 
 @Service
 public class GameServiceImpl implements GameService {
+
+    @Autowired
+    private MessageSource messageSource;
+
     private final Map<UUID, Game> games = new HashMap<>();
 
-    public GameServiceImpl() {
-
-    }
+//    private List<GamePlugin> plugins;
+//
+//    public GameServiceImpl(List<GamePlugin> plugins) {
+//        this.plugins = plugins;
+//    }
 
     @Override
     public Game createGame(GameCreationParams gameCreationParams, UUID playerId) {
         Set<UUID> playerIds = new HashSet<>();
         playerIds.add(playerId);
-        Game newGame;
+        playerIds.add(UUID.randomUUID());
+        GamePlugin gamePlugin;
         switch (gameCreationParams.getGameType()) {
             case "tictactoe" -> {
                 //newGame = new TicTacToeGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
-                newGame = new TicTacToeGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(playerId, UUID.randomUUID()));
+                //newGame = new TicTacToeGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(playerId, UUID.randomUUID()));
+                gamePlugin = new TicTacToePlugin(messageSource);
             }
 
             case "15 puzzle" -> {
                 //newGame = new TaquinGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
-                newGame = new TaquinGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(playerId, UUID.randomUUID()));
+                //newGame = new TaquinGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(playerId, UUID.randomUUID()));
+                gamePlugin = new TaquinPlugin(messageSource);
             }
 
             case "connect4" -> {
                // newGame = new ConnectFourGameFactory().createGame(gameCreationParams.getPlayerCount(), gameCreationParams.getBoardSize());
-                newGame = new ConnectFourGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(playerId, UUID.randomUUID()));
+                //newGame = new ConnectFourGameFactory().createGame(gameCreationParams.getBoardSize(), Set.of(playerId, UUID.randomUUID()));
+                gamePlugin = new ConnectFourPlugin(messageSource);
             }
 
             default -> throw new IllegalArgumentException("game type can not be found");
         }
 
+        Game newGame = gamePlugin.createGame(OptionalInt.of(gameCreationParams.getBoardSize()), playerIds);
         games.put(newGame.getId(), newGame);
+
         return newGame;
     }
 
+
     @Override
     public List<Game> getAllGamesByStatus(GameStatus status) {
-
         List<Game> filteredGames = new ArrayList<>();
         for (Game game : games.values()) {
             if (game.getStatus() == status) {
@@ -111,4 +125,5 @@ public class GameServiceImpl implements GameService {
         }
 
     }
+
 }

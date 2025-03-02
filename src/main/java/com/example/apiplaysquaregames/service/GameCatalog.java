@@ -1,9 +1,9 @@
 package com.example.apiplaysquaregames.service;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 
 public interface GameCatalog {
-
-    Collection<String> getGamesIdentifiers();
+    List<String> getGamesIdentifiers(Locale locale);
 
 }
